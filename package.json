@@ -1,0 +1,36 @@
+{
+  "name": "voxaroo_backend",
+  "version": "1.0.0",
+  "description": "E-commerce backend API ",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "migrations:generate": "sequelize-cli migration:generate --name",
+    "migrations:run": "sequelize-cli db:migrate",
+    "migrations:undo": "sequelize-cli db:generate:undo"
+  },
+  "keywords": [
+    "E-commerce",
+    "nuvolo",
+    "Mexico"
+  ],
+  "author": "Fabian Gutierrez",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "16.3.1",
+    "express": "4.18.2",
+    "joi": "^17.10.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "3.6.1"
+  },
+  "eslintConfig": {
+    "extends": "standard"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "standard": "17.1.0"
+  }
+}

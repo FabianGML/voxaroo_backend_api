@@ -1,0 +1,13 @@
+node_modules
+
+.env
+
+.drawio
+
+./db/data/*
+
+
+#Until the test are available
+mysql-server.js
+
+.node-version
