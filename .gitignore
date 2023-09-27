@@ -4,8 +4,8 @@ node_modules
 
 .drawio
 
-./db/data/*
-
+./db/data
+./db/data/mysql.sock
 
 #Until the test are available
 mysql-server.js

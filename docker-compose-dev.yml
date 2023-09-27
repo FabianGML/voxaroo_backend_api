@@ -16,10 +16,8 @@ services:
     image: mysql:latest
     container_name: my-mysql
     environment:
-      - MYSQL_ROOT_PASSWORD:admin123
-      - MYSQL_DATABASE:voxaroo
-      - MYSQL_USER:fabian
-      - MYSQL_PASSWORD:admin
+      - MYSQL_ROOT_PASSWORD=admin123
+      - MYSQL_DATABASE=voxaroo
     ports:
       - "3306:3306"
     volumes: 
@@ -30,6 +28,5 @@ services:
     ports: 
       - "8080:80" 
     environment:
-      - MYSQL_ROOT_PASSWORD:admin123
+      - MYSQL_ROOT_PASSWORD=admin123
       - PMA_HOST=mysql
-    

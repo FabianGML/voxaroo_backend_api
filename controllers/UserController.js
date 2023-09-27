@@ -1,5 +1,3 @@
-import { getBearer, verifyToken } from '../utils/jwtToken.js'
-
 export class UserController {
   constructor ({ userModel }) {
     this.userModel = userModel
@@ -11,14 +9,10 @@ export class UserController {
   */
   getUser = async (req, res) => {
     try {
-      const token = getBearer(req, res)
-      // Verify if the token is valid
-      const payload = verifyToken({ token })
-      if (payload.message) {
-        return res.json({ message: payload.message })
-      }
+      const { id } = req.params
+      const username = req.username
       // calling the user model to get the profile
-      const result = await this.userModel.getUser({ id: payload.sub, username: payload.username })
+      const result = await this.userModel.getUser({ id, username })
       delete result.id
       delete result.password
       delete result.recovery_token
@@ -30,23 +24,52 @@ export class UserController {
 
   createUser = async (req, res) => {
     try {
-      const { email, username, name, lastname, password, roles, city, state, role } = req.body
-      const isCustomer = role === 'customer' || false
-      const result = await this.userModel.createUser({ email, username, name, lastname, password, roles, city, state, isCustomer })
+      const { email, username, name, lastname, password, roles, city, state, isSeller } = req.body
+      const result = await this.userModel.createUser({ email, username, name, lastname, password, roles, city, state, isSeller })
       if (result.error) return res.status(400).json(result)
-      res.json(result)
+      res.status(201).json(result)
     } catch (error) {
       console.error(error)
     }
   }
 
+  // Create seller only if the user already exist (token must be provided)
+  createSeller = async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await this.userModel.createSellerProfile({ id })
+      res.status(201).json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   updateUser = async (req, res) => {
     try {
+      const { id } = req.params
       const { email, username, name, lastname, password, roles, city, state } = req.body
-      const token = getBearer(req, res)
-      const payload = verifyToken({ token })
-      const result = await this.userModel.updateUser({ id: payload.sub, email, username, name, lastname, password, roles, city, state })
+      const result = await this.userModel.updateUser({ id, email, username, name, lastname, password, roles, city, state })
       if (result.error) return res.status(400).json(result)
+      res.json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  deleteUser = async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await this.userModel.deleteUser({ id })
+      res.json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  deleteSeller = async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await this.userModel.deleteSeller({ id })
       res.json(result)
     } catch (error) {
       console.log(error)

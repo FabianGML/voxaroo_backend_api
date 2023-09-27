@@ -17,7 +17,7 @@ CREATE TABLE customers (
 );
 
 CREATE TABLE sellers (
-  user_id BINARY(16) NOT NULL,
+  user_id BINARY(16) PRIMARY KEY NOT NULL,
   score DECIMAL(2,1) DEFAULT '0.0',
   sales SMALLINT DEFAULT '0',
   FOREIGN KEY(user_id) REFERENCES users(id)

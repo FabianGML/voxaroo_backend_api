@@ -5,12 +5,11 @@ const name = Joi.string().max(20)
 const lastname = Joi.string().max(20)
 const email = Joi.string().email()
 const password = Joi.string()
-  .pattern(/^(?=.*[A-Z])(?!.*[\W_])(.{5,20})$/)
   .messages({
     'string.pattern.base': 'La contraseña debe contener al menos una letra mayúscula y no contener caracteres especiales.',
     'string.empty': 'La contraseña no puede estar vacía.'
   })
-const role = Joi.string().valid('customer', 'seller')
+const isSeller = Joi.boolean().required()
 const city = Joi.string().valid('durango').messages({ 'any.only': 'La ciudad unicamente puede ser Durango' })
 const state = Joi.string().valid('durango').messages({ 'any.only': 'El estado unicamente puede ser Durango' })
 
@@ -19,10 +18,14 @@ export const createUserSchema = Joi.object({
   name: name.required(),
   lastname: lastname.required(),
   email: email.required(),
-  password: password.required(),
-  role: role.required(),
+  password: password.pattern(/^(?=.*[A-Z])(?!.*[\W_])(.{5,20})$/).required(),
+  isSeller,
   city: city.required(),
   state: state.required()
+})
+
+export const sellerSchema = Joi.object({
+  password: password.required()
 })
 
 export const updateUserSchema = Joi.object({
@@ -33,4 +36,9 @@ export const updateUserSchema = Joi.object({
   password: password.required(),
   city,
   state
+})
+
+export const updatePasswordSchema = Joi.object({
+  password: password.pattern(/^(?=.*[A-Z])(?!.*[\W_])(.{5,20})$/).required(),
+  repeatPasssword: Joi.string().valid(Joi.ref('password')).messages({ 'any.only': 'Las contraseñas deben coincidir' })
 })
