@@ -2,27 +2,42 @@ import bcrypt from 'bcrypt'
 import { signToken } from '../utils/signToken.js'
 import { connection } from '../db/config.js'
 import { handleSqlError } from '../utils/handleSqlError.js'
+import { generate } from 'generate-password'
 
 export class User {
+  constructor () {
+    this.location = 'durango'
+  }
+
   /* ---------------------------------------------------
           Get the user based on the token recived
      ---------------------------------------------------
   */
-  static async getUser ({ id, username }) {
-    const [result] = await connection.query('SELECT * FROM users WHERE id = UUID_TO_BIN(?);', [id])
-    if (username !== result[0].username) return { error: 'token' }
-    return result[0]
+  static async getUser ({ id }) {
+    let isAdmin = false
+    let isSeller = false
+    const [result] = await connection.query('SELECT username, image FROM users WHERE id = UUID_TO_BIN(?);', [id])
+    const [admin] = await connection.query('SELECT * FROM admins WHERE user_id = UUID_TO_BIN(?);', [id])
+    const [seller] = await connection.query('SELECT * FROM sellers WHERE user_id = UUID_TO_BIN(?);', [id])
+    if (admin.length > 0) isAdmin = true
+    if (seller.length > 0) isSeller = true
+    return { ...result[0], isAdmin, isSeller }
+  }
+
+  static async getProfile ({ id }) {
+    // const [result] = await connection.query('SELECT BIN_TO_UUID(id) as id, username, image')
   }
 
   /* ---------------------------------------------------
                         Create new user
      ---------------------------------------------------
   */
-  static async createUser ({ email, username, name, lastname, password, city, state, isSeller }) {
+  static async createUser ({ email, username, name, lastname, password, isAdmin }) {
     // Recovery the UUID to sign the jwt Token
     const [uuidResult] = await connection.query('SELECT UUID() uuid')
     const [{ uuid }] = uuidResult
-
+    const city = this.location
+    const state = this.location
     // hashing the password
     password = await bcrypt.hash(password, 12)
 
@@ -42,17 +57,17 @@ export class User {
     } catch (error) {
       return handleSqlError(error)
     }
-    if (isSeller) await this.createSellerProfile({ id: uuid })
+    if (isAdmin) await this.createSellerProfile({ id: uuid })
 
     return { id: uuid, token }
   }
 
   /* ---------------------------------------------------
-        Create profile wether is customer or seller
+        Create profile wether is customer or admin
      ---------------------------------------------------
   */
   static async createSellerProfile ({ id }) {
-    // Create the seller with the user_id reference
+    // Create the admin with the user_id reference
     try {
       const [result] = await connection.query('INSERT INTO sellers (user_id) VALUE (UUID_TO_BIN(?));', [id])
       if (result) return { message: 'Tu perfil se añadio a los vendedores correctamente' }
@@ -62,7 +77,7 @@ export class User {
   }
 
   static async createCustomerProfile ({ uuid }) {
-    // Create the seller with the user_id reference
+    // Create the admin with the user_id reference
     await connection.query('INSERT INTO customers (user_id) VALUE (UUID_TO_BIN(?));', [uuid])
   }
 
@@ -70,11 +85,14 @@ export class User {
                       Update user
      ---------------------------------------------------
   */
-  static async updateUser ({ id, email, username, name, lastname, city, state }) {
+  static async updateUser ({ id, email, username, name, lastname }) {
     // Search the user, if the user doesn't exist,
     try {
       const [user] = await connection.query('SELECT username FROM users WHERE id = UUID_TO_BIN(?);', [id])
       const dbUsername = user[0].username
+
+      const city = this.location
+      const state = this.location
 
       // updating the user entry
       await connection.query(
@@ -104,5 +122,44 @@ export class User {
   static async deleteSeller ({ id }) {
     const result = await connection.query('DELETE FROM sellers WHERE user_id = UUID_TO_BIN(?);', [id])
     return result
+  }
+
+  /* ---------------------------------------------------
+                        Admins
+     ---------------------------------------------------
+  */
+
+  static async getAdmins ({ id }) {
+    const [result] = await connection.query('SELECT BIN_TO_UUID(users.id) AS id, users.name, users.lastname, users.username, users.email, users.city, users.state, role FROM admins JOIN users ON id= user_id WHERE id != UUID_TO_BIN(?);', [id])
+    return result[0]
+  }
+
+  static async createAdmin ({ email, username, name, lastname }) {
+    const [uuidResult] = await connection.query('SELECT UUID() uuid')
+    const [{ uuid }] = uuidResult
+    const password = generate({ length: 12, numbers: true })
+    const hashedPassword = await bcrypt.hash(password, 12)
+    const location = 'durango'
+    const city = location
+    const state = location
+    try {
+      await connection.query(
+        `INSERT INTO users (id, email, username, name, lastname, password, city, state)
+          VALUES
+              (UUID_TO_BIN(?),?,?,?,?,?,?,? );
+        `,
+        [uuid, email, username, name, lastname, hashedPassword, city, state]
+      )
+    } catch (error) {
+      console.log(error)
+    }
+    await connection.query('INSERT INTO admins (user_id, role) VALUES (UUID_TO_BIN(?),?);', [uuid, 'admin'])
+    return { email, username, password }
+  }
+
+  static async deleteAdmin ({ id }) {
+    await connection.query('DELETE FROM admins WHERE user_id = UUID_TO_BIN(?);', [id])
+    await connection.query('DELETE FROM users WHERE id = UUID_TO_BIN(?);', [id])
+    return { message: 'Administrador eliminado correctamente' }
   }
 }

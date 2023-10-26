@@ -4,7 +4,8 @@ export const validateData = (schema, property) => {
     const { error } = schema.validate(data, { abortEarly: false })
     if (error) {
       const errorMessage = error.details.map(arr => arr.message)
-      return res.status(400).json({ errorMessage })
+      console.log(errorMessage)
+      return res.status(400).json({ error: errorMessage })
     }
     next()
   }

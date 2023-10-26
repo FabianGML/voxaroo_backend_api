@@ -7,12 +7,13 @@ export const verifyToken = (req, res, next) => {
     return res.status(401).json({ error: 'Unauthorized' })
   }
   const token = req.headers.authorization.split(' ')[1]
+  if (!token) return res.status(401).json({ error: 'Unauthorized' })
   jwt.verify(token, config.jwtKey, async (err, decoded) => {
     let daysPassed
     let dbUsername
     let username
-    const { id } = req.params
     if (decoded) {
+      const id = decoded.sub
       // Making sure the token is valid by comparing the token's id and username with the id param and db username
       const [user] = await connection.query('SELECT username FROM users WHERE id = UUID_TO_BIN(?);', [id])
       if (user.length === 0) return res.status(400).json({ error: 'El usuario no existe' })
@@ -23,7 +24,9 @@ export const verifyToken = (req, res, next) => {
       const currentTimestamp = new Date()
       const tokenTimestamp = new Date(decoded.timestamp)
       daysPassed = (currentTimestamp - tokenTimestamp) / (1000 * 60 * 60 * 24)
+      req.id = decoded.sub
       req.username = decoded.username
+      req.role = decoded.role
     }
     if (err || daysPassed > 21 || username !== dbUsername) {
       return res.status(401).json({ error: 'Unauthorized' })

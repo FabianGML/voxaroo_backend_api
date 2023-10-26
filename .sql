@@ -8,6 +8,7 @@ CREATE TABLE users (
   recovery_token TEXT,
   city VARCHAR(50) NOT NULL,
   state VARCHAR(50) NOT NULL
+  image VARCHAR(255) DEFAULT 'users-images/default.jpg'
 );
 
 CREATE TABLE customers (
@@ -23,9 +24,22 @@ CREATE TABLE sellers (
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
+CREATE TABLE admins (
+    user_id BINARY(16) PRIMARY KEY NOT NULL, 
+    role VARCHAR(10) NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+INSERT INTO users(id, username, name, lastname, email, password, city, state) VALUES 
+(UUID_TO_BIN(UUID()), 'admin1', 'admin', 'admin', 'admin@admin.com', '$2b$12$feSQTa1FZKXhB8dI/KJCKOsugQIozFrxHVzW92xq6n9TFwzZ.yHUS', 'durango', 'durango');
+
+-- Run this query when you get the admin's id, in order to have a superadmin role
+-- INSERT INTO admins(user_id, role) VALUES 
+-- (UUID_TO_BIN('f5efa2a2-5e24-11ee-86e8-0242ac120002'), 'superadmin')
+
 CREATE TABLE categories (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(30) NOT NULL UNIQUE
 );
 
 CREATE TABLE products (
@@ -37,6 +51,7 @@ CREATE TABLE products (
     seller_id BINARY(16) NOT NULL,
     category_id INT NOT NULL,
     active BOOLEAN DEFAULT true,
+    description TEXT,
     FOREIGN KEY(seller_id) REFERENCES sellers(user_id),
     FOREIGN KEY(category_id) REFERENCES categories(id)
 );
@@ -89,3 +104,4 @@ CREATE TABLE images (
     FOREIGN KEY(product_id) REFERENCES products(id),
     FOREIGN KEY(sale_point_id) REFERENCES sale_points(id)
 ); 
+

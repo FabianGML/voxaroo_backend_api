@@ -9,13 +9,19 @@ export class UserController {
   */
   getUser = async (req, res) => {
     try {
-      const { id } = req.params
-      const username = req.username
+      const id = req.id
       // calling the user model to get the profile
-      const result = await this.userModel.getUser({ id, username })
-      delete result.id
-      delete result.password
-      delete result.recovery_token
+      const result = await this.userModel.getUser({ id })
+      res.json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  getProfile = async (req, res) => {
+    try {
+      const id = req.id
+      const result = await this.userModel.getProfile({ id })
       res.json(result)
     } catch (error) {
       console.log(error)
@@ -24,31 +30,21 @@ export class UserController {
 
   createUser = async (req, res) => {
     try {
-      const { email, username, name, lastname, password, roles, city, state, isSeller } = req.body
-      const result = await this.userModel.createUser({ email, username, name, lastname, password, roles, city, state, isSeller })
-      if (result.error) return res.status(400).json(result)
+      let { email, username, name, lastname, password, isSeller } = req.body
+      if (!isSeller) isSeller = false
+      const result = await this.userModel.createUser({ email, username, name, lastname, password, isSeller })
+      if (result && result.error) return res.status(400).json(result)
       res.status(201).json(result)
     } catch (error) {
       console.error(error)
     }
   }
 
-  // Create seller only if the user already exist (token must be provided)
-  createSeller = async (req, res) => {
-    try {
-      const { id } = req.params
-      const result = await this.userModel.createSellerProfile({ id })
-      res.status(201).json(result)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   updateUser = async (req, res) => {
     try {
-      const { id } = req.params
-      const { email, username, name, lastname, password, roles, city, state } = req.body
-      const result = await this.userModel.updateUser({ id, email, username, name, lastname, password, roles, city, state })
+      const id = req.id
+      const { email, username, name, lastname, password, roles } = req.body
+      const result = await this.userModel.updateUser({ id, email, username, name, lastname, password, roles })
       if (result.error) return res.status(400).json(result)
       res.json(result)
     } catch (error) {
@@ -58,7 +54,7 @@ export class UserController {
 
   deleteUser = async (req, res) => {
     try {
-      const { id } = req.params
+      const id = req.id
       const result = await this.userModel.deleteUser({ id })
       res.json(result)
     } catch (error) {
@@ -66,10 +62,55 @@ export class UserController {
     }
   }
 
+  // ------------------- Seller Controllers ------------------------------
+  // Create seller only if the user already exist (token must be provided)
+  createSeller = async (req, res) => {
+    try {
+      const id = req.id
+      const result = await this.userModel.createSellerProfile({ id })
+      res.status(201).json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   deleteSeller = async (req, res) => {
     try {
-      const { id } = req.params
+      const id = req.id
       const result = await this.userModel.deleteSeller({ id })
+      res.json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // ------------------- Admin Controllers ------------------------------
+  getAdmins = async (req, res) => {
+    try {
+      const id = req.id
+      const result = await this.userModel.getAdmins({ id })
+      res.json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  createAdmin = async (req, res) => {
+    try {
+      const role = req.role
+      const { email, username, name, lastname } = req.body
+      if (role !== 'superadmin') return res.status(401).json({ error: 'Unauthorized' })
+      const result = await this.userModel.createAdmin({ email, username, name, lastname })
+      res.status(201).json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  deleteAdmin = async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await this.userModel.deleteAdmin({ id })
       res.json(result)
     } catch (error) {
       console.log(error)

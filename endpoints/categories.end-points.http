@@ -1,0 +1,36 @@
+GET http://localhost:3000/categories
+###
+
+//Create multiple categories (only admin and superAdmin)
+POST http://localhost:3000/categories
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNWVmYTJhMi01ZTI0LTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMjA6MDQ6MDUuNjMzWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk1OTMxNDQ1fQ.GdKZvdDK01l6GobhbVVoqN3jAGU7HHQvcKa7obgwuU4
+
+{
+    "categories": [
+        {"name": "verano"},
+        {"name": "electroNica"},
+        {"name": "baño"},
+        {"name": "juguetEs"}
+    ]
+}
+
+### 
+
+PATCH http://localhost:3000/categories/27
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNWVmYTJhMi01ZTI0LTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMjA6MDQ6MDUuNjMzWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk1OTMxNDQ1fQ.GdKZvdDK01l6GobhbVVoqN3jAGU7HHQvcKa7obgwuU4
+
+{
+    "name": "electronica"
+}
+
+###
+
+DELETE http://localhost:3000/categories/26
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNWVmYTJhMi01ZTI0LTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMjA6MDQ6MDUuNjMzWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk1OTMxNDQ1fQ.GdKZvdDK01l6GobhbVVoqN3jAGU7HHQvcKa7obgwuU4
+
+{
+    "password": "Admin123"
+}

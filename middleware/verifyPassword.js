@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import { connection } from '../db/config.js'
 
 export const verifyPassword = async (req, res, next) => {
-  const { id } = req.params
+  const id = req.id
   const { password } = req.body
   // Retrieving the user hashed password and making sure the user actualy exist
   const [user] = await connection.query('SELECT username, password as hashPassword FROM users WHERE id = UUID_TO_BIN(?);', [id])

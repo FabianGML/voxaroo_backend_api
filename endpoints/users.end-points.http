@@ -1,0 +1,158 @@
+# ------------------------------------------------------------------
+#       To make the request work, you need to replace the tokens 
+#               with the ones returned by the POST request
+#-------------------------------------------------------------------
+# Get a single user based on the jwt token (id required)
+GET http://localhost:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMzlmNGZhZC02ZDU5LTExZWUtYjU4OS0wMjQyYWMxMjAwMDMiLCJ1c2VybmFtZSI6ImFkbWluMiIsInRpbWVzdGFtcCI6IjIwMjMtMTAtMThUMDE6NTc6NTMuMDE3WiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY5NzU5NDI3M30.ypWTCqSsZVunRRotKB7QcHhZtmPokDzeR7o87X_kb5Y
+
+###
+
+#Create Seller 
+POST http://localhost:3000/users
+content-type: application/json
+
+{
+    "email": "seller3@seller3.com",
+    "username": "seller3",
+    "name": "seller",
+    "lastname": "seller",
+    "password": "Seller123",
+    "isSeller": true,
+    "city": "durango",   
+    "state": "durango"   
+}
+
+###
+# Create Customer
+POST http://localhost:3000/users
+content-type: application/json
+
+{
+    "email": "custome@customer.com",
+    "username": "customer1",
+    "name": "customer",
+    "lastname": "customer",
+    "password": "Customer123",
+    "isSeller": false,
+    "city": "durango",   
+    "state": "durango"   
+}
+
+
+###
+
+# Update user (password and id is required)
+PATCH http://localhost:3000/users/
+content-type: application/json
+Authorization: Bearer 
+
+{
+    "email": "customer@customer.com",
+    "username": "customer1",
+    "name": "customer",
+    "lastname": "customer",
+    "password": "Customer123",
+    "city": "durango", 
+    "state": "durango"   
+}
+
+### 
+
+# Delete the entire user from db (id required)
+DELETE http://localhost:3000/users/
+content-type: application/json
+Authorization: Bearer 
+
+{
+    "password": "Customer123"
+}
+
+###
+# -------------------------- Sellers Endpoints -------------------------------
+#Create a seller profile when the user already exist in the db (id required)
+POST http://localhost:3000/users/sellers/
+Content-Type: application/json
+Authorization: Bearer 
+
+{
+    "password": "Customer123"
+}
+###
+
+#Delete a user from the sellers table (id required)
+DELETE http://localhost:3000/users/sellers/
+content-type: application/json
+Authorization: Bearer 
+###
+
+# -------------------------- Admins Endpoints -------------------------------
+# Get the entire list of admins (superAdmin Only)
+GET http://localhost:3000/users/admin
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNWVmYTJhMi01ZTI0LTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMjA6MDQ6MDUuNjMzWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk1OTMxNDQ1fQ.GdKZvdDK01l6GobhbVVoqN3jAGU7HHQvcKa7obgwuU4
+
+###
+# Create Admin user (superAdmin id required)
+POST http://localhost:3000/users/admin
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNWVmYTJhMi01ZTI0LTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMjA6MDQ6MDUuNjMzWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk1OTMxNDQ1fQ.GdKZvdDK01l6GobhbVVoqN3jAGU7HHQvcKa7obgwuU4
+
+{
+    "username": "admin2",
+    "name": "admin2",
+    "lastname": "admin2",
+    "email": "admin2@admin2.com",
+    "password": "Admin123"
+}
+
+###
+
+DELETE http://localhost:3000/users/admin/bb8c73c4-6220-11ee-8915-0242ac120002
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNWVmYTJhMi01ZTI0LTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMjA6MDQ6MDUuNjMzWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk1OTMxNDQ1fQ.GdKZvdDK01l6GobhbVVoqN3jAGU7HHQvcKa7obgwuU4
+
+{
+    "password": "Admin123"
+}
+
+Seller 1
+{
+  "id": "8e6dec84-5db3-11ee-86e8-0242ac120002",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4ZTZkZWM4NC01ZGIzLTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6InNlbGxlcjEiLCJ0aW1lc3RhbXAiOiIyMDIzLTA5LTI4VDA0OjAwOjI3LjA5N1oiLCJpYXQiOjE2OTU4NzM2Mjd9.1oEm5dgxPfxgH8eDknaI0at1ceHHWEMQe5MwEjKttAw"
+}
+
+Seller 2
+{
+  "id": "cee0d927-6232-11ee-8915-0242ac120002",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZWUwZDkyNy02MjMyLTExZWUtODkxNS0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6InNlbGxlcjIiLCJ0aW1lc3RhbXAiOiIyMDIzLTEwLTAzVDIxOjIxOjI1LjYyMFoiLCJpYXQiOjE2OTYzNjgwODV9.70QPQX3mOHIOgWmN_bOAv_wQ2EcLtPXeymo5y99RPwc"
+}
+
+Seller 3
+{
+  "id": "e8a8f898-6234-11ee-8915-0242ac120002",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOGE4Zjg5OC02MjM0LTExZWUtODkxNS0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6InNlbGxlcjMiLCJ0aW1lc3RhbXAiOiIyMDIzLTEwLTAzVDIxOjM2OjI3Ljg3NVoiLCJpYXQiOjE2OTYzNjg5ODd9.UItUO8yrsZjXEyHRfqCrWi9o9uiX1Cfj3wOYvoEwwMo"
+}
+
+Customer 1
+{
+  "id": "c4551393-5db3-11ee-86e8-0242ac120002",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNDU1MTM5My01ZGIzLTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImN1c3RvbWVyMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMDQ6MDE6NTcuNDEyWiIsImlhdCI6MTY5NTg3MzcxN30.GLGYbfag1aktOMqLBP2bF6-ujcD9B_kSocKaHjNjyWc"
+}
+
+Customer 2
+{
+  "id": "9be6b4fd-5db3-11ee-86e8-0242ac120002",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YmU2YjRmZC01ZGIzLTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImN1c3RvbWVyMiIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMDQ6MDA6NDkuNjk1WiIsImlhdCI6MTY5NTg3MzY0OX0.CNN6-juD5hFI_c0BKADXdrolvfeMgH08FQzicdQwZDY"
+}
+
+Superadmin (admin1) 
+{
+    "id": "f5efa2a2-5e24-11ee-86e8-0242ac120002",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNWVmYTJhMi01ZTI0LTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMjA6MDQ6MDUuNjMzWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk1OTMxNDQ1fQ.GdKZvdDK01l6GobhbVVoqN3jAGU7HHQvcKa7obgwuU4"
+}
+
+Admin2
+{
+    "id": "bb8c73c4-6220-11ee-8915-0242ac120002",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMzlmNGZhZC02ZDU5LTExZWUtYjU4OS0wMjQyYWMxMjAwMDMiLCJ1c2VybmFtZSI6ImFkbWluMiIsInRpbWVzdGFtcCI6IjIwMjMtMTAtMThUMDE6NTc6NTMuMDE3WiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY5NzU5NDI3M30.ypWTCqSsZVunRRotKB7QcHhZtmPokDzeR7o87X_kb5Y"
+}

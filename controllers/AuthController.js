@@ -1,23 +1,21 @@
-import { getBearer, verifyToken } from '../utils/jwtToken.js'
-
 export class AuthController {
   constructor ({ authModel }) {
     this.authModel = authModel
   }
 
-  verifyPassword = async (req, res) => {
+  login = async (req, res) => {
+    const { email, password } = req.body
+    const result = await this.authModel.login({ email, password })
+    if (result.error) return res.status(400).json(result)
+    res.json(result)
+  }
+
+  changePassword = async (req, res) => {
     try {
-      const { password } = req.body
-      const { redirect } = req.params
-      const token = getBearer(req, res)
-      const { sub } = verifyToken({ token })
-      const { message, match } = await this.authModel.verifyPassword({ id: sub, password, redirect })
-      if (message) {
-        res.json({ message })
-      }
-      if (match) {
-        res.redirect(`http://localhost:3000/${redirect}`)
-      }
+      const id = req.id
+      const { newPassword } = req.body
+      const result = await this.authModel.changePassword({ id, newPassword })
+      res.json(result)
     } catch (error) {
       console.log(error)
     }
