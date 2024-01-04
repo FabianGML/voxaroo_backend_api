@@ -30,9 +30,8 @@ export class UserController {
 
   createUser = async (req, res) => {
     try {
-      let { email, username, name, lastname, password, isSeller } = req.body
-      if (!isSeller) isSeller = false
-      const result = await this.userModel.createUser({ email, username, name, lastname, password, isSeller })
+      const { email, username, name, lastname, password } = req.body
+      const result = await this.userModel.createUser({ email, username, name, lastname, password })
       if (result && result.error) return res.status(400).json(result)
       res.status(201).json(result)
     } catch (error) {
@@ -43,8 +42,9 @@ export class UserController {
   updateUser = async (req, res) => {
     try {
       const id = req.id
-      const { email, username, name, lastname, password, roles } = req.body
-      const result = await this.userModel.updateUser({ id, email, username, name, lastname, password, roles })
+      const { email, username, name, lastname } = req.body
+      const token = req.headers.authorization.split(' ')[1]
+      const result = await this.userModel.updateUser({ id, email, username, name, lastname, token })
       if (result.error) return res.status(400).json(result)
       res.json(result)
     } catch (error) {
@@ -56,6 +56,17 @@ export class UserController {
     try {
       const id = req.id
       const result = await this.userModel.deleteUser({ id })
+      res.json(result)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  checkPassword = async (req, res) => {
+    try {
+      const id = req.id
+      const { password } = req.body
+      const result = await this.userModel.checkPassword({ id, password })
       res.json(result)
     } catch (error) {
       console.log(error)

@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { UserController } from '../controllers/userController.js'
+import { UserController } from '../controllers/UserController.js'
 import { validateData, validateId } from '../middleware/dataValidation.js'
 import { verifyPassword } from '../middleware/verifyPassword.js'
-import { createUserSchema, updateUserSchema, sellerSchema, createAdminSchema } from '../schemas/user.schema.js'
+import { createUserSchema, updateUserSchema, sellerSchema, createAdminSchema, validatePassword } from '../schemas/user.schema.js'
 import { verifyToken } from '../middleware/verifyToken.js'
 import { checkRoles } from '../middleware/checkRoles.js'
 
@@ -26,11 +26,16 @@ export const createUserRouter = ({ userModel }) => {
     userController.createUser
   )
 
+  userRouter.post('/check-password',
+    validateData(validatePassword, 'body'),
+    verifyToken,
+    userController.checkPassword
+  )
+
   // Update the user info
   userRouter.patch('/',
     validateData(updateUserSchema, 'body'),
     verifyToken,
-    verifyPassword,
     userController.updateUser
   )
 

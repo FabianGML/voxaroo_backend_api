@@ -5,9 +5,7 @@ import { handleSqlError } from '../utils/handleSqlError.js'
 import { generate } from 'generate-password'
 
 export class User {
-  constructor () {
-    this.location = 'durango'
-  }
+  static location = 'durango'
 
   /* ---------------------------------------------------
           Get the user based on the token recived
@@ -15,29 +13,51 @@ export class User {
   */
   static async getUser ({ id }) {
     let isAdmin = false
-    let isSeller = false
+    let isSuperAdmin = false
     const [result] = await connection.query('SELECT username, image FROM users WHERE id = UUID_TO_BIN(?);', [id])
     const [admin] = await connection.query('SELECT * FROM admins WHERE user_id = UUID_TO_BIN(?);', [id])
-    const [seller] = await connection.query('SELECT * FROM sellers WHERE user_id = UUID_TO_BIN(?);', [id])
-    if (admin.length > 0) isAdmin = true
-    if (seller.length > 0) isSeller = true
-    return { ...result[0], isAdmin, isSeller }
+    if (admin.length > 0) {
+      isSuperAdmin = admin[0].role === 'superadmin'
+      isAdmin = admin[0].role === 'admin'
+    }
+    return { ...result[0], isAdmin, isSuperAdmin }
   }
 
   static async getProfile ({ id }) {
-    // const [result] = await connection.query('SELECT BIN_TO_UUID(id) as id, username, image')
+    const [result] = await connection.query('SELECT *, BIN_TO_UUID(id) AS id  FROM users WHERE id = UUID_TO_BIN(?)', [id])
+    delete result[0].password
+    delete result[0].recovery_token
+    return { ...result[0] }
+  }
+
+  /* ---------------------------------------------------
+          Validate the password recived in the request
+     ---------------------------------------------------
+  */
+  static async checkPassword ({ id, password }) {
+    // Retrieving the user hashed password and making sure the user actualy exist
+    console.log(id)
+    const [user] = await connection.query('SELECT password as hashPassword FROM users WHERE id = UUID_TO_BIN(?);', [id])
+    if (user.length === 0) {
+      return { error: 'No se encontro el usuario' }
+    }
+    // verifying if the password match with the hashed password from db
+    const hashPassword = user[0].hashPassword
+    const match = await bcrypt.compare(password, hashPassword)
+    if (!match) return { error: 'Contraseña incorrecta' }
+    return { message: 'Contraseña correcta' }
   }
 
   /* ---------------------------------------------------
                         Create new user
      ---------------------------------------------------
   */
-  static async createUser ({ email, username, name, lastname, password, isAdmin }) {
+  static async createUser ({ email, username, name, lastname, password }) {
     // Recovery the UUID to sign the jwt Token
     const [uuidResult] = await connection.query('SELECT UUID() uuid')
     const [{ uuid }] = uuidResult
-    const city = this.location
-    const state = this.location
+    const city = User.location
+    const state = User.location
     // hashing the password
     password = await bcrypt.hash(password, 12)
 
@@ -53,39 +73,18 @@ export class User {
         `,
         [uuid, email, username, name, lastname, password, city, state]
       )
-      await this.createCustomerProfile({ uuid })
     } catch (error) {
       return handleSqlError(error)
     }
-    if (isAdmin) await this.createSellerProfile({ id: uuid })
 
     return { id: uuid, token }
-  }
-
-  /* ---------------------------------------------------
-        Create profile wether is customer or admin
-     ---------------------------------------------------
-  */
-  static async createSellerProfile ({ id }) {
-    // Create the admin with the user_id reference
-    try {
-      const [result] = await connection.query('INSERT INTO sellers (user_id) VALUE (UUID_TO_BIN(?));', [id])
-      if (result) return { message: 'Tu perfil se añadio a los vendedores correctamente' }
-    } catch (error) {
-      return handleSqlError(error)
-    }
-  }
-
-  static async createCustomerProfile ({ uuid }) {
-    // Create the admin with the user_id reference
-    await connection.query('INSERT INTO customers (user_id) VALUE (UUID_TO_BIN(?));', [uuid])
   }
 
   /* ---------------------------------------------------
                       Update user
      ---------------------------------------------------
   */
-  static async updateUser ({ id, email, username, name, lastname }) {
+  static async updateUser ({ id, email, username, name, lastname, token }) {
     // Search the user, if the user doesn't exist,
     try {
       const [user] = await connection.query('SELECT username FROM users WHERE id = UUID_TO_BIN(?);', [id])
@@ -99,8 +98,8 @@ export class User {
         'UPDATE users SET email = ?, username = ?, name = ?, lastname = ?, city = ?, state = ? WHERE id = UUID_TO_BIN(?);'
         , [email, username, name, lastname, city, state, id])
       // If the username changed, we sign the token again
-      let token
-      if (username !== dbUsername) token = signToken(id, username).token
+      if (username !== dbUsername) token = signToken({ uuid: id, username }).token
+      console.log('token user', token)
       return { message: 'Informacion actualizada correctamente', token }
     } catch (error) {
       return handleSqlError(error)
@@ -112,16 +111,6 @@ export class User {
     await this.deleteProfiles({ id })
     await connection.query('DELETE FROM users WHERE id = UUID_TO_BIN(?);', [id])
     return { message: 'Usuario eliminado' }
-  }
-
-  static async deleteProfiles ({ id }) {
-    await connection.query('DELETE FROM sellers WHERE user_id = UUID_TO_BIN(?);', [id])
-    await connection.query('DELETE FROM customers WHERE user_id = UUID_TO_BIN(?);', [id])
-  }
-
-  static async deleteSeller ({ id }) {
-    const result = await connection.query('DELETE FROM sellers WHERE user_id = UUID_TO_BIN(?);', [id])
-    return result
   }
 
   /* ---------------------------------------------------

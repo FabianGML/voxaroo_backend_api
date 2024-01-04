@@ -19,7 +19,10 @@ export const createApp = ({ userModel, authModel, categoryModel, productModel })
     'http://localhost:5173'
   ]))
   app.use('/images', express.static('public/images'))
-
+  app.use((req, res, next) => {
+    console.log(req.method)
+    next()
+  })
   app.use('/users', createUserRouter({ userModel }))
   app.use('/auth', createAuthRouter({ authModel }))
   app.use('/categories', createCategoryRouter({ categoryModel }))

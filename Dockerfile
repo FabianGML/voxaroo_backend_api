@@ -1,13 +1,14 @@
-FROM node:18.17.1-alpine
+FROM node:18.17.1
 
-RUN mkdir -p /home/app
+WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm i -g nodemon
+RUN npm install 
 
 COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "index.js"]
+CMD ["npm", "run", "dev"]

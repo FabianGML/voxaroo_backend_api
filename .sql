@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS `marketplace`;
+
 CREATE TABLE users (
   id binary(16) PRIMARY KEY NOT NULL DEFAULT (UUID_TO_BIN(uuid())),
   username VARCHAR(20) NOT NULL UNIQUE,
@@ -7,22 +9,22 @@ CREATE TABLE users (
   password TEXT NOT NULL,
   recovery_token TEXT,
   city VARCHAR(50) NOT NULL,
-  state VARCHAR(50) NOT NULL
+  state VARCHAR(50) NOT NULL,
   image VARCHAR(255) DEFAULT 'users-images/default.jpg'
 );
 
-CREATE TABLE customers (
-  user_id BINARY(16) PRIMARY KEY NOT NULL,
-  score DECIMAL(2,1) DEFAULT '0.0',
-  FOREIGN KEY(user_id) REFERENCES users(id)
-);
+-- CREATE TABLE customers (
+--   user_id BINARY(16) PRIMARY KEY NOT NULL,
+--   score DECIMAL(2,1) DEFAULT '0.0',
+--   FOREIGN KEY(user_id) REFERENCES users(id)
+-- );
 
-CREATE TABLE sellers (
-  user_id BINARY(16) PRIMARY KEY NOT NULL,
-  score DECIMAL(2,1) DEFAULT '0.0',
-  sales SMALLINT DEFAULT '0',
-  FOREIGN KEY(user_id) REFERENCES users(id)
-);
+-- CREATE TABLE sellers (
+--   user_id BINARY(16) PRIMARY KEY NOT NULL,
+--   score DECIMAL(2,1) DEFAULT '0.0',
+--   sales SMALLINT DEFAULT '0',
+--   FOREIGN KEY(user_id) REFERENCES users(id)
+-- );
 
 CREATE TABLE admins (
     user_id BINARY(16) PRIMARY KEY NOT NULL, 
@@ -33,9 +35,9 @@ CREATE TABLE admins (
 INSERT INTO users(id, username, name, lastname, email, password, city, state) VALUES 
 (UUID_TO_BIN(UUID()), 'admin1', 'admin', 'admin', 'admin@admin.com', '$2b$12$feSQTa1FZKXhB8dI/KJCKOsugQIozFrxHVzW92xq6n9TFwzZ.yHUS', 'durango', 'durango');
 
--- Run this query when you get the admin's id, in order to have a superadmin role
+-- Run this query when you get the admin's id, in order to have a superadmin role (run the login endpoint in the "auth.end-points.http" file and change the id)
 -- INSERT INTO admins(user_id, role) VALUES 
--- (UUID_TO_BIN('f5efa2a2-5e24-11ee-86e8-0242ac120002'), 'superadmin')
+-- (UUID_TO_BIN('fc8c1926-7762-11ee-8992-0242ac120002'), 'superadmin')
 
 CREATE TABLE categories (
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,7 +54,7 @@ CREATE TABLE products (
     category_id INT NOT NULL,
     active BOOLEAN DEFAULT true,
     description TEXT,
-    FOREIGN KEY(seller_id) REFERENCES sellers(user_id),
+    FOREIGN KEY(seller_id) REFERENCES users(id),
     FOREIGN KEY(category_id) REFERENCES categories(id)
 );
 
@@ -63,7 +65,7 @@ CREATE TABLE comment (
     is_comment BOOLEAN DEFAULT true,
     customer_id BINARY(16),
     product_id BINARY(16),
-    FOREIGN KEY(customer_id) REFERENCES customers(user_id),
+    FOREIGN KEY(customer_id) REFERENCES users(id),
     FOREIGN KEY(product_id) REFERENCES products(id)
 );
 
@@ -74,8 +76,8 @@ CREATE TABLE sales (
     seller_id BINARY(16) NOT NULL,
     customer_id BINARY(16) NOT NULL,
     created_at DATE DEFAULT (NOW()),
-    FOREIGN KEY(seller_id) REFERENCES sellers(user_id),
-    FOREIGN KEY(customer_id) REFERENCES customers(user_id)
+    FOREIGN KEY(seller_id) REFERENCES users(id),
+    FOREIGN KEY(customer_id) REFERENCES users(id)
 );
 
 CREATE TABLE sales_products (
@@ -104,4 +106,12 @@ CREATE TABLE images (
     FOREIGN KEY(product_id) REFERENCES products(id),
     FOREIGN KEY(sale_point_id) REFERENCES sale_points(id)
 ); 
+
+CREATE TABLE favorites_products (
+    customer_id BINARY(16) NOT NULL,
+    product_id BINARY(16) NOT NULL,
+    PRIMARY KEY(customer_id, product_id),
+    FOREIGN KEY(customer_id) REFERENCES users(id),
+    FOREIGN KEY(product_id) REFERENCES products(id)
+);
 

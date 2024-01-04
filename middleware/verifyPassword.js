@@ -1,6 +1,12 @@
 import bcrypt from 'bcrypt'
 import { connection } from '../db/config.js'
 
+/**
+ * Verify if the password match with the hashed password from db
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
 export const verifyPassword = async (req, res, next) => {
   const id = req.id
   const { password } = req.body

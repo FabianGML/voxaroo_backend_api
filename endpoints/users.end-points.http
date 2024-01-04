@@ -4,57 +4,36 @@
 #-------------------------------------------------------------------
 # Get a single user based on the jwt token (id required)
 GET http://localhost:3000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMzlmNGZhZC02ZDU5LTExZWUtYjU4OS0wMjQyYWMxMjAwMDMiLCJ1c2VybmFtZSI6ImFkbWluMiIsInRpbWVzdGFtcCI6IjIwMjMtMTAtMThUMDE6NTc6NTMuMDE3WiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY5NzU5NDI3M30.ypWTCqSsZVunRRotKB7QcHhZtmPokDzeR7o87X_kb5Y
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MGZmNGRkYS05NDk3LTExZWUtOTg5ZC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6InNlbGxlcjEiLCJ0aW1lc3RhbXAiOiIyMDIzLTEyLTIyVDAxOjM4OjU3LjI1MVoiLCJpYXQiOjE3MDMyMDkxMzd9.bTgLIZC9-vO_17jF70VHYeI-4tFcAJ_0tI_RubMZ63I
 
 ###
 
-#Create Seller 
+#Create User 
 POST http://localhost:3000/users
 content-type: application/json
 
 {
     "email": "seller3@seller3.com",
     "username": "seller3",
-    "name": "seller",
+    "name": "seller", 
     "lastname": "seller",
     "password": "Seller123",
-    "isSeller": true,
     "city": "durango",   
     "state": "durango"   
 }
-
-###
-# Create Customer
-POST http://localhost:3000/users
-content-type: application/json
-
-{
-    "email": "custome@customer.com",
-    "username": "customer1",
-    "name": "customer",
-    "lastname": "customer",
-    "password": "Customer123",
-    "isSeller": false,
-    "city": "durango",   
-    "state": "durango"   
-}
-
 
 ###
 
 # Update user (password and id is required)
 PATCH http://localhost:3000/users/
 content-type: application/json
-Authorization: Bearer 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNjEzZTU2Yi1hNTA3LTExZWUtYWNiMS0wMjQyYWMxMjAwMDMiLCJ1c2VybmFtZSI6InNlbGxlcjEiLCJ0aW1lc3RhbXAiOiIyMDI0LTAxLTAyVDIwOjE3OjM0Ljg3NFoiLCJpYXQiOjE3MDQyMjY2NTR9.gfcvcAwnwLzLKcoNZwMGlOoYOTdK-Y2gWe4fFbGzmUw
 
 {
-    "email": "customer@customer.com",
-    "username": "customer1",
-    "name": "customer",
-    "lastname": "customer",
-    "password": "Customer123",
-    "city": "durango", 
-    "state": "durango"   
+    "name": "fabian",
+    "lastname": "seller",
+    "username": "seller1",
+    "email": "seller@seller.com"
 }
 
 ### 
@@ -147,8 +126,8 @@ Customer 2
 
 Superadmin (admin1) 
 {
-    "id": "f5efa2a2-5e24-11ee-86e8-0242ac120002",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNWVmYTJhMi01ZTI0LTExZWUtODZlOC0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMDktMjhUMjA6MDQ6MDUuNjMzWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk1OTMxNDQ1fQ.GdKZvdDK01l6GobhbVVoqN3jAGU7HHQvcKa7obgwuU4"
+    "id": "fc8c1926-7762-11ee-8992-0242ac120002",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYzhjMTkyNi03NzYyLTExZWUtODk5Mi0wMjQyYWMxMjAwMDIiLCJ1c2VybmFtZSI6ImFkbWluMSIsInRpbWVzdGFtcCI6IjIwMjMtMTAtMzFUMDA6MDE6MjEuNjEwWiIsInJvbGUiOiJzdXBlcmFkbWluIiwiaWF0IjoxNjk4NzEwNDgxfQ.d6h5AD34E39HOsATo3V1t6Szcw9livapljSVKtdUavw"
 }
 
 Admin2

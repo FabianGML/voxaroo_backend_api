@@ -15,7 +15,9 @@ export const verifyToken = (req, res, next) => {
     if (decoded) {
       const id = decoded.sub
       // Making sure the token is valid by comparing the token's id and username with the id param and db username
+      console.log('decoded', decoded)
       const [user] = await connection.query('SELECT username FROM users WHERE id = UUID_TO_BIN(?);', [id])
+      console.log(user)
       if (user.length === 0) return res.status(400).json({ error: 'El usuario no existe' })
       if (id !== decoded.sub) return res.status(401).json({ error: 'Unauthorized' })
       dbUsername = user[0].username
